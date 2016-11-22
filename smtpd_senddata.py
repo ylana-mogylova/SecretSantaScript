@@ -23,13 +23,19 @@ def sent_message(recipient, your_name):
     # Create the message
     msg = MIMEText('You are Secret Santa for '+ your_name)
     msg['To'] = email.utils.formataddr(('Recipient', recipient))
-    msg['From'] = email.utils.formataddr(('Author', 'test@example.com'))
+    msg['From'] = email.utils.formataddr(('Author', 'steve@sociable.social'))
     msg['Subject'] = 'Secret Santa'
 
-    server = smtplib.SMTP('127.0.0.1', 1025)
+    #server = smtplib.SMTP('smtp.sparkpostmail.com', 587)
+    server = smtplib.SMTP('email-smtp.us-east-1.amazonaws.com:587')
+
     server.set_debuglevel(True)  # show communication with the server
     try:
-        server.sendmail('test@example.com', [recipient], msg.as_string())
+        server.connect('email-smtp.us-east-1.amazonaws.com', 587)
+        server.ehlo()
+        server.starttls()
+        server.login('AKIAJXDHCOOQA4AIKVLQ', 'AgsWLSn9jVsjpXk4VPmlJdhI6B5csIwRAqR19RnqVY9a')
+        server.sendmail('steve@sociable.social', [recipient], msg.as_string())
     finally:
         server.quit()
 
@@ -45,15 +51,11 @@ def create_secret_santa_dictionary():
 
     # generate random name from the list participant_names_list
     name_index = random_name(len(participant_names_list)-1)
-    print('name_index=', name_index)
     name = participant_names_list[name_index]
-    print(name)
 
     # generate random email from the participant_emails_list
     email_index = random_name(len(participant_emails_list)-1)
-    print('email_index=', participant_emails_list)
     email = participant_emails_list[email_index]
-    print(email)
 
     # check that name and email are different
     if name not in email:
@@ -61,21 +63,20 @@ def create_secret_santa_dictionary():
         SecretSanta_dictionary[email] = name
         # delete name from the participant_names_list
         del participant_names_list[name_index]
-        print(participant_names_list)
+
         # delete email from the participant_emails_list
         del participant_emails_list[email_index]
-        print(participant_emails_list)
+
 
 
 def create_global_lists():
     global participant_names_list, participant_emails_list
     # create the list of names from the global dictionary
     participant_names_list = list(participant_dictionary.keys())
-    print(participant_names_list)
 
     # create the list of mails from the global dictionary
     participant_emails_list = list(participant_dictionary.values())
-    print(participant_emails_list)
+
 
 # first time create global list
 create_global_lists()
@@ -95,6 +96,7 @@ if len(participant_names_list) != 0:
     SecretSanta_dictionary = {'Uliana.Mogylova@globalrelay.net': participant_names_list[0]}
 
 # TODO call function to send mails
+sent_message('Uliana.Mogylova@globalrelay.net', 'Steven Peter Elliott')
 
 print("SecretSantaDictionary=")
 print(SecretSanta_dictionary)
