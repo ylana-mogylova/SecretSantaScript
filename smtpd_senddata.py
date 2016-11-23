@@ -18,15 +18,14 @@ participant_emails_list = []
 SecretSanta_dictionary = {}
 
 
-# function to send mail, not tested yet, need to setup smtp server first
+# function to send mail
 def sent_message(recipient, your_name):
     # Create the message
     msg = MIMEText('You are Secret Santa for '+ your_name)
     msg['To'] = email.utils.formataddr(('Recipient', recipient))
-    msg['From'] = email.utils.formataddr(('Author', 'steve@sociable.social'))
+    msg['From'] = email.utils.formataddr(('Interop Secret Santa 2016', 'uliana@sociable.social'))
     msg['Subject'] = 'Secret Santa'
 
-    #server = smtplib.SMTP('smtp.sparkpostmail.com', 587)
     server = smtplib.SMTP('email-smtp.us-east-1.amazonaws.com:587')
 
     server.set_debuglevel(True)  # show communication with the server
@@ -35,7 +34,7 @@ def sent_message(recipient, your_name):
         server.ehlo()
         server.starttls()
         server.login('AKIAJXDHCOOQA4AIKVLQ', 'AgsWLSn9jVsjpXk4VPmlJdhI6B5csIwRAqR19RnqVY9a')
-        server.sendmail('steve@sociable.social', [recipient], msg.as_string())
+        server.sendmail('uliana@sociable.social', [recipient], msg.as_string())
     finally:
         server.quit()
 
@@ -68,7 +67,6 @@ def create_secret_santa_dictionary():
         del participant_emails_list[email_index]
 
 
-
 def create_global_lists():
     global participant_names_list, participant_emails_list
     # create the list of names from the global dictionary
@@ -81,6 +79,7 @@ def create_global_lists():
 # first time create global list
 create_global_lists()
 
+# create secret santa dictionary
 while len(participant_emails_list) > 0:
     # check if the last name and the last email is the same person
     # if yes, re-create again global dictionaries
@@ -95,8 +94,7 @@ if len(participant_names_list) != 0:
     # assign the last name to Uliana.Mogylova@globalrelay.net mail
     SecretSanta_dictionary = {'Uliana.Mogylova@globalrelay.net': participant_names_list[0]}
 
-# TODO call function to send mails
-sent_message('Uliana.Mogylova@globalrelay.net', 'Steven Peter Elliott')
-
-print("SecretSantaDictionary=")
-print(SecretSanta_dictionary)
+# loop dictionary which grab pair (key:value)
+# key is a mail recipient, value is a name
+for mail, name in SecretSanta_dictionary.items():
+    sent_message(mail, name)
